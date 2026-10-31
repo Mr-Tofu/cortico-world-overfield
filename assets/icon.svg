@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="OverField">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101827"/>
+      <stop offset="1" stop-color="#1d2b3a"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#63f5c8"/>
+      <stop offset="1" stop-color="#4aa8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <circle cx="64" cy="64" r="35" fill="none" stroke="url(#ring)" stroke-width="7" opacity="0.95"/>
+  <path d="M46 64c8-18 28-18 36 0-8 18-28 18-36 0Z" fill="#0b1220" stroke="#a7fff0" stroke-width="3"/>
+  <circle cx="64" cy="64" r="6" fill="#a7fff0"/>
+  <text x="64" y="112" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700" fill="#8fb4c9" letter-spacing="2">OF</text>
+</svg>

@@ -1,0 +1,81 @@
+{
+  "name": "cortico-world-overfield",
+  "version": "0.8.0",
+  "type": "module",
+  "description": "Coopanion World for 开放空间 (OverField): capture/relay chat transport, event pushes (chat, scene, position, friends, profile), and chat replies. Chat recording lives in the separate 开放空间聊天 World. 开放空间扩展：抓包/中转读聊天、推送游戏事件、回消息；不截图、不 OCR、不注入游戏进程。",
+  "license": "MIT",
+  "author": "Mr-Tofu",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mr-Tofu/cortico-world-overfield.git"
+  },
+  "homepage": "https://github.com/Mr-Tofu/cortico-world-overfield#readme",
+  "bugs": {
+    "url": "https://github.com/Mr-Tofu/cortico-world-overfield/issues"
+  },
+  "os": [
+    "win32"
+  ],
+  "keywords": [
+    "cortico-world",
+    "cortico",
+    "coopanion",
+    "overfield",
+    "开放空间",
+    "chat",
+    "events",
+    "position",
+    "protobuf",
+    "npcap",
+    "relay",
+    "game"
+  ],
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "bridge",
+    "relay",
+    "assets/emotions.json",
+    "assets/icon.svg",
+    "describe.json",
+    "README.md",
+    "DISCLAIMER.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "cortico": {
+    "kind": "world",
+    "api": 6,
+    "displayName": "开放空间",
+    "icon": "assets/icon.svg",
+    "describe": "describe.json",
+    "tags": [
+      "game",
+      "external-setup",
+      "computer-use",
+      "unofficial-api",
+      "sensitive-data",
+      "injection-risk",
+      "experimental"
+    ],
+    "locales": {
+      "zh": {
+        "displayName": "开放空间",
+        "description": "《开放空间 / OverField》的事件与聊天扩展：被动抓包（只读）或本地中转（可读、可发附近/世界/私聊）。把私聊、提到你、关键词、场景、位置、好友上下线、本人资料变化推给桌宠，并可用 of_chat_send 回消息。聊天记录由「开放空间聊天」World 负责。不截图、不做 OCR、不注入游戏进程。非官方项目，仅供学习；中转会改动网络链路，存在账号风险，使用前请读免责声明。"
+      },
+      "en": {
+        "displayName": "OverField",
+        "description": "Events and chat for 开放空间 / OverField: passive capture (read-only) or a local relay (read plus Nearby/World/Private sends). Pushes private messages, mentions, keywords, scene, position, friend online state and your profile changes, and can reply with of_chat_send. Chat recording belongs to the separate OverField Chat World. No screenshots, no OCR, no process injection. Unofficial, for learning; relay touches the network path and carries account risk — read the disclaimer first."
+      }
+    }
+  }
+}

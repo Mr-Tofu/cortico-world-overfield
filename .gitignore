@@ -1,0 +1,8 @@
+node_modules/
+tmp/
+*.tgz
+*.log
+overfield-chat/
+workspace/
+builds/
+.DS_Store

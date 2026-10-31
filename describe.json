@@ -1,0 +1,344 @@
+{
+  "tools": [
+    {
+      "name": "of_send_keys",
+      "description": "Send one key chord directly to the 开放空间 (OverField) game window through Win32 SendInput, without a screenshot. It restores and foregrounds the window first, presses the keys, holds for holdMs, then releases them. Use it for game actions: \"w\", \"shift\", \"space\", \"1\", \"tab\", \"esc\". One chord per call; keys are joined with +. It returns one text line with success and elapsed time, never an image. Do not use it to type chat messages; use of_chat_send for that. It obeys the computer-use switch by default.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "chord": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "One chord joined with +, for example \"w\", \"shift\", \"space\", \"1\", \"ctrl+shift+g\". Not a sequence."
+          },
+          "holdMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000,
+            "description": "How long to keep the chord down, in milliseconds; defaults to the extension setting (80). 0 taps."
+          }
+        },
+        "required": [
+          "chord"
+        ]
+      },
+      "tags": [
+        "act"
+      ],
+      "summary": {
+        "zh": "把一组按键直接发给开放空间窗口，可设按住时长，只回一行文字。",
+        "en": "Send one chord to the OverField window with an optional hold, as text only."
+      }
+    },
+    {
+      "name": "of_chat_send",
+      "description": "Send one chat message in 开放空间 (OverField). In relay mode it sends over the game protocol on the existing gateway connection: no window focus, no clipboard, and it works for Nearby (0), World (1) and Private (2, with target player id). Without the relay it falls back to the clipboard path for the Nearby channel only: bring the game forward, press Enter, click the configured input box, Ctrl+V, Enter. Use it only for chat messages: no account names, passwords, or multi-line text. For plain game keys use of_send_keys. A server receipt only means the request was accepted; it does not prove the other player saw the message.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "One line of chat text. Newlines are refused so a single call cannot send several messages."
+          },
+          "channel": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7,
+            "description": "0 Nearby (default), 1 World, 2 Private, 5 Team. Relay mode only; the clipboard fallback always uses Nearby."
+          },
+          "target": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Target player id for private chat (channel 2). Ignored by other channels."
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "tags": [
+        "act"
+      ],
+      "summary": {
+        "zh": "中转模式下直接走协议发聊天（附近/世界/私聊）；没有中转时用剪贴板发附近。",
+        "en": "Send chat over the relay protocol (Nearby/World/Private), or via clipboard for Nearby without a relay."
+      }
+    },
+    {
+      "name": "of_chat_read",
+      "description": "Read recent chat messages from 开放空间 (OverField) as plain text lines. Messages come from the game protocol itself (channel, time, speaker, content); this extension never screenshots the game. The optional channels filter accepts ids or names, for example \"0,1,2\" or \"nearby,world,private\". Returns the last n messages, oldest first, shaped as \"[channel HH:MM] nick: content\". If the chat process is not running it says so instead of guessing.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "description": "How many recent messages to return; defaults to 20."
+          },
+          "channels": {
+            "type": "string",
+            "maxLength": 120,
+            "description": "Channels to include: ids (\"0,1,2\") or names (\"nearby,world,private\"). Omit for all."
+          }
+        },
+        "required": []
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "直接读游戏聊天协议（频道/时间/昵称/内容），可只取指定频道。",
+        "en": "Read the chat protocol directly (channel/time/name/text), optionally filtered by channel."
+      }
+    },
+    {
+      "name": "of_chat_bridge",
+      "description": "Start, stop or inspect the chat process for 开放空间 (OverField). Two modes: capture reads the gateway TCP stream passively through Npcap (read only); relay runs a local dispatch/gate relay that can also send chat over the protocol. status reports the mode, adapter or relay ports, counters and the last error; start launches the configured mode in the background; stop terminates it. Neither mode injects into the game process or reads its memory. Relay mode needs the one-time hosts line from relay/setup-hosts.cmd. Chat recording lives in the separate 开放空间聊天 World; this process only feeds events and sends.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "status",
+              "start",
+              "stop"
+            ],
+            "description": "What to do with the chat process. Defaults to status."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "capture",
+              "relay"
+            ],
+            "description": "Override chatMode for this start. Switching modes stops the other process first."
+          },
+          "ports": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Capture mode: optional gateway port ranges, e.g. \"11000-11100\"."
+          },
+          "device": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Capture mode: optional Npcap adapter name or description fragment."
+          }
+        },
+        "required": []
+      },
+      "tags": [
+        "read",
+        "act"
+      ],
+      "summary": {
+        "zh": "查看、启动或停止聊天进程：被动抓包（只读）或本地中转（可读可发）。",
+        "en": "Inspect, start or stop the chat process: passive capture (read) or local relay (read + send)."
+      }
+    },
+    {
+      "name": "of_scene",
+      "description": "Return the current 开放空间 (OverField) scene roster: scene id, channel, how many players are here, and each player with their player id and distance when both positions are known. Read-only, from the scene sync packets. The roster is a snapshot that only changes on a real scene/channel change; it is not a live list and does not refresh on movement.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "tags": [
+        "read",
+        "snapshot"
+      ],
+      "summary": {
+        "zh": "回当前场景/频道、人数和每个人的位置与距离。",
+        "en": "Report the current scene/channel, player count, and each player with distance."
+      }
+    },
+    {
+      "name": "of_friends",
+      "description": "List friends with online state, level and signature. In relay mode it asks the server for a fresh list; otherwise it returns the last list seen in capture (the client must have opened the friend panel at least once). The relay currently sends an empty FriendReq and the server answers status=2 with no list, so an empty result means the request was not accepted, not that you have no friends.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "tags": [
+        "read",
+        "snapshot"
+      ],
+      "summary": {
+        "zh": "列好友：在线状态、等级、签名；中转模式可现拉。",
+        "en": "List friends with online state, level and signature; relay mode refreshes."
+      }
+    },
+    {
+      "name": "of_player_info",
+      "description": "Show what is known about a player: own profile, a friend, someone in the scene, or someone who spoke recently. Omit playerId for your own character. Relay mode can refresh friends but does not probe arbitrary players.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Player id; omit for yourself."
+          }
+        },
+        "required": []
+      },
+      "tags": [
+        "read",
+        "snapshot"
+      ],
+      "summary": {
+        "zh": "查本人/好友/同场景/最近说话的人的资料。",
+        "en": "Look up what is known about yourself, a friend, someone in the scene or a recent speaker."
+      }
+    },
+    {
+      "name": "of_chat_history",
+      "description": "Read recent private messages with one player. In relay mode it asks the server for a fresh record, which works when the server returns status=1; otherwise it returns the last record seen in capture (the client must have opened that private chat).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "The other player id."
+          },
+          "n": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "description": "How many recent messages; defaults to 20."
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "读与某个玩家的私聊记录；中转模式可现拉。",
+        "en": "Read private chat history with one player; relay mode refreshes."
+      }
+    },
+    {
+      "name": "of_unread",
+      "description": "List private messages from other players that are still unanswered, oldest conversation first. Each line names the player, how many messages are pending, and the last message. It marks them read by default (the pet has now seen them); pass markRead=false to only peek, or target one player id. The World also pushes an of.privateUnread reminder on its own when a private message stays unanswered.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "markRead": {
+            "type": "boolean",
+            "description": "Mark the listed conversations read; defaults to true."
+          },
+          "target": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Only this player id."
+          }
+        },
+        "required": []
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "列还没回的私聊，默认标记已读；同一人没回会由 World 自动提醒。",
+        "en": "List unanswered private messages and mark them read; the World reminds you when one goes unanswered."
+      }
+    },
+    {
+      "name": "of_position",
+      "description": "Read the last known position of yourself or one other player in 开放空间 (OverField). Coordinates come from the scene sync packets and refresh about every 2 seconds. Omit both arguments for yourself; pass `playerId` or `name` for someone else. Use it only when you actually need a position (for example to walk toward a player); do not poll it in a loop. It is read-only and never moves anyone.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Player id; omit for yourself."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "Display name, if the id is not known."
+          }
+        },
+        "required": []
+      },
+      "tags": [
+        "read",
+        "snapshot"
+      ],
+      "summary": {
+        "zh": "读本人或某个玩家最后已知的位置、场景和距你多远；只读，不会移动任何人。",
+        "en": "Read the last known position, scene and distance for yourself or one player; read-only, never moves anyone."
+      }
+    },
+    {
+      "name": "of_state",
+      "description": "Return a short text state of the 开放空间 (OverField) window: foreground, client size, chat transport mode and how many messages were captured. Read-only: it does not bring the game forward, click, type, or send, and it never screenshots the game. If the window is missing it still reports the chat process state instead of guessing.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "tags": [
+        "read",
+        "snapshot"
+      ],
+      "summary": {
+        "zh": "回窗口是否前台、client 尺寸和聊天进程状态。",
+        "en": "Report foreground, client size and chat process state."
+      }
+    }
+  ],
+  "events": [
+    {
+      "type": "of.chat",
+      "description": {
+        "zh": "抓到的聊天：默认推私聊和提到你的内容；每个频道、关键词都能单独开关，meta.reasons 会说明为什么推。",
+        "en": "Captured chat: private messages and mentions push by default; every channel and keyword has its own switch, and meta.reasons says why it pushed."
+      }
+    },
+    {
+      "type": "of.privateUnread",
+      "description": {
+        "zh": "有人给你发了私聊、你一直没回时的提醒：会带上对方名字、条数和最后一条内容。",
+        "en": "A reminder that a private message is still unanswered: who it is, how many, and the last line."
+      }
+    },
+    {
+      "type": "of.scene",
+      "description": {
+        "zh": "换了场景或频道（需要打开「场景变化」推送）：场景 id、频道、在场人数。",
+        "en": "Scene or channel changed (when scene pushes are on): scene id, channel, player count."
+      }
+    },
+    {
+      "type": "of.position",
+      "description": {
+        "zh": "位置推送（默认关）：移动超过设定距离、移动间隔到了，或定时心跳时推；自动模式会拉长没动时的心跳间隔。",
+        "en": "Position push (off by default): on a large move, a move interval, or a heartbeat; auto mode lengthens the interval while you stay put."
+      }
+    },
+    {
+      "type": "of.friend",
+      "description": {
+        "zh": "好友上线/下线（需要打开「好友上下线」推送）。",
+        "en": "A friend came online or went offline (when friend pushes are on)."
+      }
+    },
+    {
+      "type": "of.profile",
+      "description": {
+        "zh": "你自己的资料变了（需要打开「本人资料」推送）：等级、世界等级、签名。",
+        "en": "Your own profile changed (when profile pushes are on): level, world level, signature."
+      }
+    }
+  ]
+}
